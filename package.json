@@ -1,0 +1,12 @@
+{
+  "name": "declic-ia",
+  "private": true,
+  "description": "Déclic : formation gratuite à l'IA (site statique, sans dépendance à l'exécution).",
+  "scripts": {
+    "integrite": "node tests/integrite.cjs",
+    "liens": "node tests/integrite.cjs --liens",
+    "e2e": "node tests/e2e.cjs",
+    "test": "node tests/integrite.cjs && node tests/e2e.cjs"
+  },
+  "devDependencies": { "playwright": "1.56.1" }
+}

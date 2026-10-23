@@ -1,0 +1,24 @@
+# Chaque lundi, ouvre une demande « Vérifier les actus et les prix » si aucune n'est déjà ouverte.
+# Le contenu n'est jamais modifié automatiquement : un humain relit les sources avant toute publication.
+name: Rappel de mise à jour des actus
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+permissions:
+  issues: write
+jobs:
+  rappel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ouvrir la demande si besoin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ouvertes=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label maj-actus --json number --jq 'length')
+          if [ "$ouvertes" = "0" ]; then
+            gh label create maj-actus --repo "$GITHUB_REPOSITORY" --color FF5A1F --description "Vérification hebdomadaire des actus et des prix" 2>/dev/null || true
+            gh issue create --repo "$GITHUB_REPOSITORY" --label maj-actus \
+              --title "Vérifier les actus et les prix (semaine du $(date +%d/%m/%Y))" \
+              --body "Procédure : docs/MISE-A-JOUR.md. 1) Relire les pages officielles des outils (prix, offres, noms). 2) Ajouter les actus utiles dans js/data/actus.js avec date et source. 3) Mettre à jour la date « verifie » des fiches relues. 4) Lancer npm test. 5) Fermer cette demande."
+          fi
